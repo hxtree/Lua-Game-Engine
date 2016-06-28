@@ -1,0 +1,33 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+function CE:message(type,id,text)
+	selectedItem = nil
+
+	CE:getXY(type,id)
+	-- set loop
+	local loop = true
+	while loop == true do
+		oldpad = pad
+		pad = Controls.read()
+		if oldpad ~= pad then
+			if pad:circle() then
+				loop = false
+			end
+		end
+
+		-- standard routine operations
+		screen:clear()
+		audio:check() -- check BGS
+		updateTime() -- gameplay timer
+		FM:GUI() -- output
+
+		CE:textBox(text,x,y)
+
+		screen.flip()
+	end
+
+	System.sleep(100)
+end

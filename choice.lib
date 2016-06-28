@@ -1,0 +1,48 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+function CE:choice(type,id,text)
+	selectedItem = 1
+	local temp = {}
+	temp[1] = text[1]
+	for i = 2, table.getn(text) do
+		table.insert(temp, " "..text[i][1])
+	end
+	CE:getXY(type,id)
+
+	-- set loop
+	local loop = true
+	while loop == true do
+		-- standard routine operations
+		screen:clear()
+		audio:check() -- check BGS
+		updateTime() -- gameplay timer
+		fieldMap:basicGUI() -- output
+
+		CE:textBox(temp,x,y)
+
+
+		oldpad = pad
+		pad = Controls.read()
+		if oldpad ~= pad then
+			if pad:circle() then
+				text[selectedItem+1][2]()
+				loop = false 
+			elseif pad:up() and selectedItem ~= 1 then 
+				selectedItem = selectedItem - 1
+			elseif pad:down() and selectedItem ~= table.getn(text) - 1 then 
+				selectedItem = selectedItem + 1
+			end
+		end
+
+		screen.flip()
+	end
+
+	-- unload
+	temp = nil
+	selectedItem = nil
+
+	System.sleep(100)
+end

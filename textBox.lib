@@ -1,0 +1,47 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+edges = Image.load("images/messageSheet.png")
+
+function CE:textBox(text,x,y)
+	box = {}
+	for i = 1, table.getn(text) do if box.width == nil or box.width < string.len(text[i])*8 + edges:width()/2*2 then box.width = string.len(text[i])*8 + edges:width()/2*2 end end
+
+	box.height = table.getn(text)*10 + edges:height()/5*2
+	box.x = x - box.width/2
+	box.y = y - box.height
+	
+	-- draw tail
+	if table.getn(text) == 1 and string.len(text[1]) < 5 then
+		screen:blit(box.x + box.width/2 - edges:width()/2, box.y + box.height, edges, 0, edges:height()/5*3, edges:width(), edges:height()/5)
+	else
+		screen:blit(box.x + box.width/2 - edges:width()/2, box.y + box.height, edges, 0, edges:height()/5*2, edges:width(), edges:height()/5)
+	end
+	-- correct offscreen
+	if box.x < 0 then box.x = 0 elseif box.x > 480 - box.width then box.x = 480 - box.width end
+	if box.y < 0 then box.y = 0 elseif box.y > 272 - box.height then box.y = 272 - box.height end
+
+	-- draw back || & ==
+	screen:fillRect(box.x + edges:width()/2, box.y, box.width - (edges:width()/2)*2, box.height, Color.new(255,255,255))
+	screen:fillRect(box.x, box.y + edges:height()/5, box.width, box.height - (edges:height()/5)*2, Color.new(255,255,255))
+	-- top right edge
+	screen:blit(box.x, box.y, edges, 0, 0, edges:width()/2, edges:height()/5)
+	-- top left edge
+	screen:blit(box.x + box.width - edges:width()/2, box.y, edges, edges:width()/2, 0, edges:width()/2, edges:height()/5)
+	-- bottom right edge
+	screen:blit(box.x, box.y + box.height - edges:height()/5, edges, 0, edges:height()/5, edges:width()/2, edges:height()/5)
+	-- bottom left edge
+	screen:blit(box.x + box.width - edges:width()/2, box.y + box.height - edges:height()/5, edges, edges:width()/2, edges:height()/5, edges:width()/2, edges:height()/5)
+
+	-- draws signal
+		-- disabled
+	-- draws text
+	for i = 1, table.getn(text) do 
+		if i == selectedItem then screen:print(box.x + edges:width()/2, box.y + edges:height()/5 + (i-1)*10+10,">",Color.new(0,0,0)) end
+ 		screen:print(box.x + edges:width()/2, box.y + edges:height()/5 + (i-1)*10,text[i],Color.new(0,0,0)) 
+	end
+	
+end
+

@@ -1,0 +1,12 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+function updateTime()
+	if party.timer:time() >= 1000 then
+		party.timer:reset()
+		party.timer:start()
+		party.time = party.time + 1
+	end
+end

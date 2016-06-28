@@ -1,0 +1,196 @@
+--[[
+Coded by: Heroux
+All Rights Reserved
+]]--
+
+camera = {}
+camera.offset = {}
+camera.character = "N/A"
+camera.level = 1
+camera.row = 1
+camera.column = 1
+camera.facing = 1
+camera.offset.x = 0
+camera.offset.y = 0
+camera.manual = false
+camera.width = 13
+
+function camera:set()
+	camera.level, camera.row, camera.column = getPos(camera.character)
+	camera.offset.x = FM.characters[camera.character][4]
+	camera.offset.y = FM.characters[camera.character][5]
+end
+
+
+function camera:rotate(direction)
+	if direction == "right" then
+		camera.facing = camera.facing + 1
+		if camera.facing > 4 then camera.facing = 1 end
+	elseif direction == "left" then
+		camera.facing = camera.facing - 1
+		if camera.facing < 1 then camera.facing = 4 end
+	end
+end
+
+
+function camera:draw()
+	-- draw background
+	screen:blit(0,0,FM.background)
+
+	-- decides what fields to draw to screen
+	if camera.facing == 1 then
+		for c = 0, camera.width * 2 do
+			if c <= camera.width then height = c
+			else height = math.mod(camera.width - math.mod(c,camera.width),camera.width)
+			end
+			for b = -height, height do
+				x = (-b + c - camera.width)*24 - camera.offset.x + 240
+				y = ( b + c - camera.width)*12 - camera.offset.y + 136
+				camera:drawField(camera.row + b, camera.column + c - camera.width,x,y)
+			end	
+		end
+	elseif camera.facing == 2 then
+		for c = 0, camera.width * 2 do
+			if c <= camera.width then height = c 
+			else height = math.mod(camera.width - math.mod(c,camera.width),camera.width)
+			end
+			for b = -height, height do
+				b = -b
+				x = (-b - c + camera.width)*24 - camera.offset.x + 240
+				y = (-b + c - camera.width)*12 + camera.offset.y + 136
+				camera:drawField(camera.row + b, camera.column + c - camera.width,x,y)
+				b = -b
+			end	
+		end
+	elseif camera.facing == 3 then
+		for c = 0, camera.width * 2 do
+			c = camera.width*2 -c
+			if c >= camera.width then height = camera.width*2 - c	
+			else height = math.mod(camera.width - math.mod(-c,camera.width),camera.width) 
+			end 
+			for b = -height, height do
+				b = -b
+				x = ( b - c + camera.width)*24 + camera.offset.x + 240
+				y = (-b - c + camera.width)*12 + camera.offset.y + 136
+				camera:drawField(camera.row + b, camera.column + c - camera.width,x,y)
+				b = -b
+			end
+			c = camera.width*2 -c
+		end
+	elseif camera.facing == 4 then
+		for c = 0, camera.width * 2 do
+			c = camera.width*2 -c
+			if c >= camera.width then height = camera.width*2 - c	
+			else height = math.mod(camera.width - math.mod(-c,camera.width),camera.width) 
+			end 
+			for b = -height, height do
+				x = ( b + c - camera.width)*24 + camera.offset.x + 240
+				y = ( b - c + camera.width)*12 - camera.offset.y + 136
+				camera:drawField(camera.row + b, camera.column + c - camera.width,x,y)
+			end
+			c = camera.width*2 -c
+		end
+	end
+end
+
+
+function camera:drawField(b, c, x1, y1)
+	for a in FM.grid do
+		if FM.grid[a][b] == nil or FM.grid[a][b][c] == nil or FM.grid[a][b][c] == 0 or FM.grid[a][b][c] == "X" then return end
+		i, x, y = FM.grid[a][b][c], x1, y1 + (-a + camera.level)*12
+		if type(i) == "number" then
+			if i > 0 then 
+				camera:drawTile(i, x, y)
+			else 
+				camera:drawObject(-i, x, y, b, c)
+			end
+		elseif type(i) == "string" then 
+			camera:drawCharacter(i, x, y)
+		end
+
+	end
+end
+
+
+
+function camera:drawTile(i,x,y)
+	x = x - 23
+	y = y - 18
+	image = FM.tileset
+	sourcex = 46 * (FM.tiles[i][2] - 1)
+	sourcey = 36 * (FM.tiles[i][1] - 1)
+	width = 46
+	height = 36
+
+	screen:blit(x, y, image, sourcex, sourcey, width, height)
+end
+
+
+
+function camera:drawObject(i,x,y,b,c)
+	local object = FM.objects[i]
+	width = objectCache[i][1]:width()/objectCache[i][3]
+	height = objectCache[i][1]:height()/objectCache[i][2]
+	x = x - width/2
+	y = y - height + 18
+	
+	if objectCache[i][4] == "wall" then
+		if camera.row > b or camera.column > c then 
+			image = objectCache[i][1]
+		end
+	else
+		image = objectCache[i][1]
+	end
+	
+	sourcex = math.mod(object[2] - 1, objectCache[i][3]) * width
+	sourcey = math.floor(object[2]/(objectCache[i][3] + 1),0) * height
+
+	screen:blit(x, y, image, sourcex, sourcey, width, height)
+end
+
+
+function camera:drawCharacter(i,x,y)
+	local character = FM.characters[i]
+
+	facing = camera.facing + character[2] - 1
+	if facing > 4 then facing = facing - 4
+	elseif facing < 1 then facing = facing + 4 end
+
+	width = character[1]:width()/6
+	height = character[1]:height()/4
+	sourcex = width * (character[3] - 1)
+	sourcey = height * (facing - 1)
+	y = y  - 4
+
+	if camera.facing == 1 then
+		x = x + character[4]
+		y = y + character[5]
+	elseif camera.facing == 2 then
+		if facing == 1 or facing == 3 then
+			x = x - character[4]
+			y = y + character[5]
+		else
+			x = x + character[4]
+			y = y - character[5]
+		end
+	elseif camera.facing == 3 then
+		x = x - character[4]
+		y = y - character[5]
+	elseif camera.facing == 4 then
+		if facing == 1 or facing == 3 then
+			x = x + character[4]
+			y = y - character[5]
+		else
+			x = x - character[4]
+			y = y + character[5]
+		end
+	end
+
+	-- draw shadow
+	screen:blit(x - shadow:width()/2, y + 18 - shadow:height(), shadow)
+	x = x - width/2
+	y = y - height + 15
+	image = character[1]
+
+	screen:blit(x, y, image, sourcex, sourcey, width, height)
+end

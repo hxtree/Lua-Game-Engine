@@ -1,0 +1,23 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+function CE:getXY(type,id)
+	-- get x,y
+	if type == "character" then
+		x = (FM.characters[id][5] - FM.characters[id][4] + focus.row - focus.column + 10)*24 - FM.characters[id][2]:width()/20 - focus.offset.x
+		y = (FM.characters[id][5] + FM.characters[id][4] - focus.row - focus.column)*12 + (-FM.characters[id][3] + focus.level)*12 + 160 - FM.characters[id][2]:height()/4 - focus.offset.y
+	elseif type == "object" then
+		for a = 1, table.getn(FM.grid) do
+			for b = 2, table.getn(FM.grid[a]) do
+				for c = 2, table.getn(FM.grid[a][b]) do
+					if id == -FM.grid[a][b][c] then
+						x = (c - b + focus.row - focus.column + 10)*24  - focus.offset.x - object[id]:width()/FM.objects[id][4]/2
+						y = (c + b - focus.row - focus.column)*12 + (-a + focus.level)*12 + 172 - focus.offset.y - object[id]:height()/FM.objects[id][3]
+					end
+				end
+			end
+		end
+	end
+end

@@ -1,0 +1,94 @@
+--[[
+All Rights Reserved
+coded by: Heroux
+]]--
+
+animation = {}
+animation.table = {}
+
+--[[
+	FM.characters[character][4] = 0;
+	FM.characters[character][5] = 0;
+	move(character,a,b,c)
+	
+	FM.characters[character][4] =-24;
+	FM.characters[character][5] =-12;
+	move(character,a,b,c)
+
+	FM.characters[character][4] = 24;
+	FM.characters[character][5] =-12;
+	move(character,a,b,c)
+
+	FM.characters[character][4] = 0;
+	FM.characters[character][5] = 0;
+	move(character,a,b,c)
+]]--
+
+function animation:play()
+	if table.getn(animation.table[camera.character]) > 1 then
+		FM.inputDisabled = true
+	else
+		FM.inputDisabled = false
+	end
+
+	for item in animation.table do
+		-- plays animation
+		if animation.table[item][1] ~= nil then
+			animation.table[item][1]()
+			table.remove(animation.table[item],1)
+		end
+
+		-- moves character to proper location based on offsets
+		if FM.characters[item][4] == 24 and FM.characters[item][5] == -12 then
+			FM.characters[item][4] = 0
+			FM.characters[item][5] = 0	
+			local a,b,c = getPos(item)
+			move(item,a,b - 1,c)
+
+		elseif FM.characters[item][4] == 24 and FM.characters[item][5] == 12 then
+			FM.characters[item][4] = 0
+			FM.characters[item][5] = 0	
+			local a,b,c = getPos(item)
+			move(item,a,b,c + 1)
+
+		elseif FM.characters[item][4] == -24 and FM.characters[item][5] == 12 then
+			FM.characters[item][4] = 0
+			FM.characters[item][5] = 0	
+			local a,b,c = getPos(item)
+			move(item,a,b + 1,c)
+
+		elseif FM.characters[item][4] == -24 and FM.characters[item][5] == -12 then
+			FM.characters[item][4] = 0
+			FM.characters[item][5] = 0	
+			local a,b,c = getPos(item)
+			move(item,a,b,c - 1)
+		end
+	end
+end
+
+function animation:call(character,type,direction)
+	if character == nil or type == nil or direction == nil then return end
+	if table.getn(animation.table[character]) ~= 0 then return end
+
+	if type == "walk" then
+		FM.characters[character][2] = direction
+
+		local a,b,c = getPos(character)
+		if direction == 1 then
+			b = b - 1
+		elseif direction == 2 then
+			c = c + 1
+		elseif direction == 3 then
+			b = b + 1
+		elseif direction == 4 then
+			c = c - 1
+		end
+		if not collisionDetect(a,b,c) then 
+			return
+		end
+
+		FM.grid[a][b][c] = "X"
+		animation:walk(character,a,b,c,direction)
+		return(true)
+	end
+end

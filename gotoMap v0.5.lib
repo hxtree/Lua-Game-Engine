@@ -1,0 +1,71 @@
+--[[
+All Rights Reserved
+coded by: Heroux
+]]--
+
+--function FM:goto(a, b, c, d, e, f, g)
+--end
+
+function FM:gotoMap(a, b, c)
+	audio:pause()
+
+	if c ~= nil then
+		FM.section, FM.area, FM.room = a,b,c 
+	elseif b~= nil then
+		FM.area, FM.room = a, b 
+	elseif a~= nil then
+		FM.room = a
+	end
+
+	-- loads map db globals based on directory
+	for a = 1, 4 do
+		if a == 1 then directory = "maps/"
+		elseif a == 2 then directory = "maps/"..FM.section.."/"
+		elseif a == 3 then directory = "maps/"..FM.section.."/"..FM.area.."/"
+		end
+		for index, file in System.listDirectory(directory) do
+			if string.sub(file.name, string.len(file.name)-2, string.len(file.name)) ==".DB" then
+				dofile(directory..file.name)
+			end
+		end
+	end
+	dofile("maps/"..FM.section.."/"..FM.area.."/"..FM.room..".map")
+
+
+	FM.background = Image.load("backgrounds/"..FM.properties.background..".png") -- load background	
+	FM.tileset = Image.load("tilesets/"..FM.properties.tileset..".png") -- load tileset
+
+
+	objectCache = {} -- clear objects
+	animation.table = {} -- clear animation table
+
+	-- sets animation table
+	for character in FM.characters do
+		animation.table[character] = {}
+	end
+
+	-- cache image and get columns & rows based on images name
+	for i in FM.objects do
+		if objectCache[i] == nil then
+		objectCache[i] = {}
+			for a = 1, 3 do
+				if a == 1 then class = "wall"
+				elseif a == 2 then class = "door"
+				else class = "basic"
+				end
+				for index, file in System.listDirectory("objects/"..class.."/") do
+					if string.sub(file.name,0,string.len(FM.objects[i][1])) == FM.objects[i][1] then
+						objectCache[i][1] = Image.load("objects/"..class.."/"..file.name)
+						objectCache[i][2] = string.sub(file.name,string.len(FM.objects[i][1])+2,string.len(file.name)-6)
+						objectCache[i][3] = string.sub(file.name,string.len(FM.objects[i][1])+4,string.len(file.name)-4)
+						objectCache[i][4] = class
+						break
+					end
+				end
+			end
+		end
+	end
+
+	CE:squareMap()
+	audio:mapLoad()
+end

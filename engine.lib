@@ -1,0 +1,32 @@
+--[[
+All Rights Reserved
+coder(s): Heroux
+]]--
+
+
+FM.inputDisabled = false
+FM.timer = Timer.new()
+FM.timer:start()
+
+FM.loop = true
+while FM.loop == true do
+	audio:check() -- check BGS
+	updateTime() -- gameplay timer
+
+	if FM.timer:time() > 30 then
+		FM.timer:reset()
+		FM.timer:start()
+		
+		FM:input()
+
+		screen:clear()
+		FM:main() -- call *.map file function	
+		animation:play() -- play animation table
+
+		camera:set() -- sets camera
+		camera:draw() -- outputs camera
+
+		screen.flip()
+	end
+	System.sleep(5)
+end

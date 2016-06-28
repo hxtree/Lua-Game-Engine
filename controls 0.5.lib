@@ -1,0 +1,65 @@
+--[[
+All Rights Reserved
+coded by: Heroux
+]]--
+
+printscreen = 1
+
+function FM:input()
+	oldpad = pad
+	pad = Controls.read()
+	if pad:start() then
+		CE:pause()
+	elseif pad:triangle() and oldpad:triangle() == false then
+		load:menuEngine()
+		unload:menuEngine()
+	elseif pad:l() and oldpad:l() == false  then
+		camera:rotate("left")
+	elseif pad:r() and oldpad:r() == false  then
+		camera:rotate("right")
+	elseif FM.inputDisabled == false then
+		if pad:square() and oldpad:square() or  pad:circle() and oldpad:circle() == false then
+			objectInteract(camera.character)
+		elseif pad:up() or pad:analogY() < -50 then
+			if camera.facing == 1 then
+				animation:call(camera.character,"walk",1)
+			elseif camera.facing == 2 then
+				animation:call(camera.character,"walk",4)
+			elseif camera.facing == 3 then
+				animation:call(camera.character,"walk",3)
+			elseif camera.facing == 4 then
+				animation:call(camera.character,"walk",2)
+			end
+		elseif pad:right() or pad:analogX() > 50 then
+			if camera.facing == 1 then
+				animation:call(camera.character,"walk",2)
+			elseif camera.facing == 2 then
+				animation:call(camera.character,"walk",1)
+			elseif camera.facing == 3 then
+				animation:call(camera.character,"walk",4)
+			elseif camera.facing == 4 then
+				animation:call(camera.character,"walk",3)
+			end
+		elseif pad.read():down() or pad:analogY() > 50 then
+			if camera.facing == 1 then
+				animation:call(camera.character,"walk",3)
+			elseif camera.facing == 2 then
+				animation:call(camera.character,"walk",2)
+			elseif camera.facing == 3 then 
+				animation:call(camera.character,"walk",1)
+			elseif camera.facing == 4 then
+				animation:call(camera.character,"walk",4)
+			end
+		elseif pad:left() or pad:analogX() < -50 then
+			if camera.facing == 1 then
+				animation:call(camera.character,"walk",4)
+			elseif camera.facing == 2 then
+				animation:call(camera.character,"walk",3)
+			elseif camera.facing == 3 then
+				animation:call(camera.character,"walk",2)
+			elseif camera.facing == 4 then
+				animation:call(camera.character,"walk",1)
+			end
+		end
+	end
+end

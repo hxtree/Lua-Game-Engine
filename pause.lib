@@ -1,0 +1,38 @@
+function CE:pause()
+	audio:check()
+	Music.pause()
+
+	local image = Image.load("images/pause.png")
+	screen:blit(0,0,image)
+	screen.flip()
+
+	local loop = true
+	while loop == true do
+		pad = Controls.read()
+		if not pad:start() then loop = false end
+	end
+	local loop = true
+	while loop == true do
+		pad = Controls.read()
+		if pad:start() then loop = false end
+		if pad:l() and pad:r() and pad:select() then
+			FM.loop = false
+		end
+		if pad:r() and pad:cross() then
+			System.usbDiskModeDeactivate()
+			Image:save("printScreens/printscreen"..printscreen..".png")
+			System.usbDiskModeActivate()
+			printscreen = printscreen + 1
+		end
+
+	end
+	local loop = true
+	while loop == true do
+		pad = Controls.read()
+		if not pad:start() then loop = false end
+	end
+	image = nil
+
+
+	Music.resume()
+end

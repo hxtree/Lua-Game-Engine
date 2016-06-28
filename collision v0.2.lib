@@ -1,0 +1,26 @@
+--[[
+All Rights Reserved
+coded by: Heroux
+]]--
+
+function collisionDetect(a,b,c)
+	if type(FM.grid[a]) ~= "table" then
+		return(false)
+	end
+
+	if type(FM.grid[a][b]) ~= "table" then
+		return(false)
+	end
+
+	if FM.grid[a][b][c] ~= 0 then
+		return(false)
+	end
+
+	for a in FM.grid do 
+		if FM.grid[a][b][c] < 0 and objectCache[a][4] == "wall" then 
+			return(false)
+		end
+	end
+
+	return(true)
+end
