@@ -1,6 +1,5 @@
 --[[
 All Rights Reserved
-coder(s): Heroux
 ]]--
 
 function updateTime()
