@@ -1,6 +1,5 @@
 --[[
 All Rights Reserved
-coded by: Heroux
 ]]--
 
 --function FM:goto(a, b, c, d, e, f, g)
